@@ -1,5 +1,5 @@
-import json
-import random
+
+import time
 from datetime import datetime
 
 from paho.mqtt import client as mqtt_client
@@ -9,7 +9,7 @@ from firebase_admin import firestore
 
 
 # Use the application default credentials
-cred = credentials.Certificate('./energy-coach-firebase-adminsdk-wxvhm-e17fe1df7f.json')
+cred = credentials.Certificate('./energy-coach-firebase-adminsdk-wxvhm-d5099bd43d.json')
 firebase_admin.initialize_app(cred, 
 {
   'projectId': 'energy-coach',
@@ -41,10 +41,24 @@ def connect_mqtt() -> mqtt_client:
 
 
 def subscribe(client: mqtt_client):
-    print("hey")
     def on_message(client, userdata, msg):
         total_power= msg.payload.decode()
-        print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+        valor1=0
+        valor0=0
+        #print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+        
+        valor1=msg.payload.decode()
+            
+        sum=float(valor1)*2
+        print(sum)
+        dtm=datetime.now()
+        data={
+            u'datetime':dtm,
+            u'consumption':sum,
+
+        }
+        db.collection(u'shellyData').add(data)
+        time.sleep(300)
 
     client.subscribe(topic)
     client.on_message = on_message
@@ -57,5 +71,8 @@ def run():
 
 
 run()
+
+
+
 
 
